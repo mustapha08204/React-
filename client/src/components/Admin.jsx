@@ -26,7 +26,8 @@ const Admin = () => {
 
   // Fetch projects and team on mount
   useEffect(() => {
-    fetch("http://localhost:5000/api/projects")
+    // fetch("http://localhost:5000/api/projects")
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch projects");
         return res.json();
@@ -34,7 +35,7 @@ const Admin = () => {
       .then((data) => setProjects(data))
       .catch((err) => setError(err.message));
 
-    fetch("http://localhost:5000/api/team")
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch team");
         return res.json();
@@ -67,7 +68,7 @@ const Admin = () => {
     formData.append("image", newProject.image);
     formData.append("link", newProject.link);
 
-    fetch("http://localhost:5000/api/projects", {
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects`, {
       method: "POST",
       body: formData,
     })
@@ -86,7 +87,7 @@ const Admin = () => {
 
   const handleDeleteProject = (id) => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/projects/${id}`, {
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -124,7 +125,7 @@ const Admin = () => {
     formData.append("role", newMember.role);
     formData.append("image", newMember.image);
 
-    fetch("http://localhost:5000/api/team", {
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team`, {
       method: "POST",
       body: formData,
     })
@@ -143,7 +144,7 @@ const Admin = () => {
 
   const handleDeleteTeamMember = (id) => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/team/${id}`, {
+    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -323,9 +324,8 @@ const Admin = () => {
               <h3>{project.title}</h3>
               <p>{project.description}</p>
               <img
-                src={`http://localhost:5000${project.image}`}
+                src={`${import.meta.env.REACT_APP_API_URL}${project.image}`}
                 alt={project.title}
-              />
               <br />
               <a href={project.link} target="_blank" rel="noopener noreferrer">
                 Project Link
@@ -383,7 +383,7 @@ const Admin = () => {
               <h3>{member.name}</h3>
               <p>{member.role}</p>
               <img
-                src={`http://localhost:5000${member.image}`}
+                 src={`${import.meta.env.REACT_APP_API_URL}${member.image}`}
                 alt={member.name}
               />
               <br />

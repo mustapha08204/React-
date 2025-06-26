@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const BACKEND_URL = "http://localhost:5000";
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Portfolio = () => {
   const [projects, setProjects] = useState([]);
@@ -12,8 +15,15 @@ const Portfolio = () => {
         if (!res.ok) throw new Error("Failed to fetch projects");
         return res.json();
       })
-      .then(setProjects)
-      .catch((err) => console.error("Failed to fetch projects:", err));
+      .then((data) => {
+        setProjects(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setError("Failed to load projects.");
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -187,11 +197,31 @@ const Portfolio = () => {
             description="Check out some of my recent projects that showcase my skills and expertise in web development."
           />
 
-          <div className="portfolio-grid">
+          {/* <div className="portfolio-grid">
             {projects.slice(0, 3).map((project) => (
               <PortfolioItem key={project.id} {...project} />
             ))}
-          </div>
+          </div> */}
+          {loading && (
+  <p style={{ textAlign: "center", color: "#888", fontSize: "1.2rem" }}>
+    Loading projects...
+  </p>
+)}
+
+{error && (
+  <p style={{ textAlign: "center", color: "red", fontSize: "1.1rem" }}>
+    {error}
+  </p>
+)}
+
+{!loading && !error && (
+  <div className="portfolio-grid">
+    {projects.slice(0, 3).map((project) => (
+      <PortfolioItem key={project.id} {...project} />
+    ))}
+  </div>
+)}
+
 
           <div className="portfolio-button-wrapper">
             <Link to="/all-projects" className="portfolio-button">
