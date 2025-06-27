@@ -31,31 +31,26 @@ const Portfolio = () => {
         * {
           box-sizing: border-box;
         }
-
         .portfolio-section {
           background: #f8fafc;
           padding: 4rem 2rem;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           color: #333;
         }
-
         .portfolio-container {
           max-width: 1400px;
           margin: 0 auto;
         }
-
         .portfolio-header {
           text-align: center;
           margin-bottom: 3rem;
         }
-
         .portfolio-title {
           font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: #222;
         }
-
         .portfolio-underline {
           width: 60px;
           height: 4px;
@@ -64,7 +59,6 @@ const Portfolio = () => {
           border-radius: 2px;
           transition: width 0.3s ease;
         }
-
         .portfolio-description {
           font-size: 1.1rem;
           color: #555;
@@ -72,13 +66,11 @@ const Portfolio = () => {
           margin: 0 auto;
           line-height: 1.6;
         }
-
         .portfolio-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
           gap: 2rem;
         }
-
         .portfolio-item {
           position: relative;
           overflow: hidden;
@@ -88,12 +80,10 @@ const Portfolio = () => {
           background: #fff;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
         .portfolio-item:hover {
           transform: translateY(-6px);
           box-shadow: 0 12px 30px rgb(0 0 0 / 0.15);
         }
-
         .portfolio-image {
           width: 100%;
           height: 300px;
@@ -102,11 +92,9 @@ const Portfolio = () => {
           border-radius: 12px 12px 0 0;
           transition: scale 0.3s ease;
         }
-
         .portfolio-item:hover .portfolio-image {
           scale: 1.05;
         }
-
         .portfolio-overlay {
           position: absolute;
           inset: 0;
@@ -122,23 +110,19 @@ const Portfolio = () => {
           border-radius: 12px;
           text-align: center;
         }
-
         .portfolio-item:hover .portfolio-overlay {
           opacity: 1;
         }
-
         .portfolio-item-title {
           font-size: 1.5rem;
           font-weight: 700;
           margin-bottom: 0.75rem;
         }
-
         .portfolio-item-desc {
           font-size: 1rem;
           margin-bottom: 1.2rem;
           line-height: 1.4;
         }
-
         .portfolio-link {
           background: white;
           color: #4f46e5;
@@ -149,17 +133,14 @@ const Portfolio = () => {
           transition: background 0.3s ease, color 0.3s ease;
           box-shadow: 0 3px 10px rgb(79 70 229 / 0.3);
         }
-
         .portfolio-link:hover {
           background: #4338ca;
           color: white;
         }
-
         .portfolio-button-wrapper {
           margin-top: 3rem;
           text-align: center;
         }
-
         .portfolio-button {
           background: #4f46e5;
           color: white;
@@ -174,12 +155,10 @@ const Portfolio = () => {
           cursor: pointer;
           display: inline-block;
         }
-
         .portfolio-button:hover {
           background: #4338ca;
           box-shadow: 0 8px 28px rgb(67 56 202 / 0.6);
         }
-
         @media (max-width: 500px) {
           .portfolio-image {
             height: 160px;

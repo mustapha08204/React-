@@ -25,7 +25,7 @@ const Admin = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch projects");
         return res.json();
@@ -33,7 +33,7 @@ const Admin = () => {
       .then((data) => setProjects(data))
       .catch((err) => setError(err.message));
 
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch team");
         return res.json();
@@ -66,7 +66,7 @@ const Admin = () => {
     formData.append("image", newProject.image);
     formData.append("link", newProject.link);
 
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`, {
       method: "POST",
       body: formData,
     })
@@ -85,7 +85,7 @@ const Admin = () => {
 
   const handleDeleteProject = (id) => {
     setLoading(true);
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects/${id}`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -123,7 +123,7 @@ const Admin = () => {
     formData.append("role", newMember.role);
     formData.append("image", newMember.image);
 
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team`, {
       method: "POST",
       body: formData,
     })
@@ -142,7 +142,7 @@ const Admin = () => {
 
   const handleDeleteTeamMember = (id) => {
     setLoading(true);
-    fetch(`${import.meta.env.REACT_APP_API_URL}/api/team/${id}`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -322,7 +322,7 @@ const Admin = () => {
               <h3>{project.title}</h3>
               <p>{project.description}</p>
               <img
-                src={`${import.meta.env.REACT_APP_API_URL}${project.image}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}${project.image}`}
                 alt={project.title}
               />
               <br />
@@ -379,7 +379,7 @@ const Admin = () => {
               <h3>{member.name}</h3>
               <p>{member.role}</p>
               <img
-                src={`${import.meta.env.REACT_APP_API_URL}${member.image}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}${member.image}`}
                 alt={member.name}
               />
               <br />
