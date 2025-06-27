@@ -24,9 +24,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch projects and team on mount
   useEffect(() => {
-    // fetch("http://localhost:5000/api/projects")
     fetch(`${import.meta.env.REACT_APP_API_URL}/api/projects`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch projects");
@@ -276,7 +274,7 @@ const Admin = () => {
 
         {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-        {/* Projects Form */}
+        {/* Project Form */}
         <form onSubmit={handleAddProject} className="admin-form">
           <input
             type="text"
@@ -326,6 +324,7 @@ const Admin = () => {
               <img
                 src={`${import.meta.env.REACT_APP_API_URL}${project.image}`}
                 alt={project.title}
+              />
               <br />
               <a href={project.link} target="_blank" rel="noopener noreferrer">
                 Project Link
@@ -341,10 +340,9 @@ const Admin = () => {
           ))}
         </div>
 
-        {/* Team Management */}
+        {/* Team Section */}
         <h2>Admin Dashboard – Team Members</h2>
 
-        {/* Team Form */}
         <form onSubmit={handleAddTeamMember} className="admin-form">
           <input
             type="text"
@@ -370,20 +368,18 @@ const Admin = () => {
             onChange={handleTeamFileChange}
             required
           />
-
           <button type="submit" disabled={loading}>
             {loading ? "Adding..." : "Add Team Member"}
           </button>
         </form>
 
-        {/* Team List */}
         <div className="admin-project-list">
           {team.map((member) => (
             <div key={member.id} className="admin-project-item">
               <h3>{member.name}</h3>
               <p>{member.role}</p>
               <img
-                 src={`${import.meta.env.REACT_APP_API_URL}${member.image}`}
+                src={`${import.meta.env.REACT_APP_API_URL}${member.image}`}
                 alt={member.name}
               />
               <br />

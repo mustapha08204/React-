@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
-
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Portfolio = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/projects`)
@@ -29,7 +28,6 @@ const Portfolio = () => {
   return (
     <>
       <style>{`
-        /* Reset & base */
         * {
           box-sizing: border-box;
         }
@@ -61,7 +59,7 @@ const Portfolio = () => {
         .portfolio-underline {
           width: 60px;
           height: 4px;
-          background: #4f46e5; /* Indigo-600 */
+          background: #4f46e5;
           margin: 0 auto 1.2rem;
           border-radius: 2px;
           transition: width 0.3s ease;
@@ -77,7 +75,7 @@ const Portfolio = () => {
 
         .portfolio-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
           gap: 2rem;
         }
 
@@ -112,7 +110,7 @@ const Portfolio = () => {
         .portfolio-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(79, 70, 229, 0.85); /* Indigo with opacity */
+          background: rgba(79, 70, 229, 0.85);
           color: white;
           opacity: 0;
           transition: opacity 0.3s ease;
@@ -153,7 +151,7 @@ const Portfolio = () => {
         }
 
         .portfolio-link:hover {
-          background: #4338ca; /* Darker Indigo */
+          background: #4338ca;
           color: white;
         }
 
@@ -182,7 +180,6 @@ const Portfolio = () => {
           box-shadow: 0 8px 28px rgb(67 56 202 / 0.6);
         }
 
-        /* Responsive tweaks */
         @media (max-width: 500px) {
           .portfolio-image {
             height: 160px;
@@ -197,31 +194,29 @@ const Portfolio = () => {
             description="Check out some of my recent projects that showcase my skills and expertise in web development."
           />
 
-          {/* <div className="portfolio-grid">
-            {projects.slice(0, 3).map((project) => (
-              <PortfolioItem key={project.id} {...project} />
-            ))}
-          </div> */}
           {loading && (
-  <p style={{ textAlign: "center", color: "#888", fontSize: "1.2rem" }}>
-    Loading projects...
-  </p>
-)}
+            <p
+              style={{ textAlign: "center", color: "#888", fontSize: "1.2rem" }}
+            >
+              Loading projects...
+            </p>
+          )}
 
-{error && (
-  <p style={{ textAlign: "center", color: "red", fontSize: "1.1rem" }}>
-    {error}
-  </p>
-)}
+          {error && (
+            <p
+              style={{ textAlign: "center", color: "red", fontSize: "1.1rem" }}
+            >
+              {error}
+            </p>
+          )}
 
-{!loading && !error && (
-  <div className="portfolio-grid">
-    {projects.slice(0, 3).map((project) => (
-      <PortfolioItem key={project.id} {...project} />
-    ))}
-  </div>
-)}
-
+          {!loading && !error && (
+            <div className="portfolio-grid">
+              {projects.slice(0, 3).map((project) => (
+                <PortfolioItem key={project.id} {...project} />
+              ))}
+            </div>
+          )}
 
           <div className="portfolio-button-wrapper">
             <Link to="/all-projects" className="portfolio-button">
