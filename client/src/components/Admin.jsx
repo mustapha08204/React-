@@ -1,400 +1,200 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-const Admin = () => {
-  const navigate = useNavigate();
-
-  // Projects state
-  const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({
-    title: "",
-    description: "",
-    image: null,
-    link: "",
-  });
-
-  // Team state
-  const [team, setTeam] = useState([]);
-  const [newMember, setNewMember] = useState({
+export default function Admin({ user, onLogout }) {
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
     name: "",
     role: "",
-    image: null,
+    field: "",
+    bio: "",
+    email: "",
+    phone: "",
+    linkedin: "",
+    github: "",
+    avatar: "", // URL string
   });
+  const [error, setError] = useState("");
+  const [adding, setAdding] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  // Fetch team members on load
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch projects");
-        return res.json();
-      })
-      .then((data) => setProjects(data))
-      .catch((err) => setError(err.message));
-
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch team");
-        return res.json();
-      })
-      .then((data) => setTeam(data))
-      .catch((err) => setError(err.message));
+    fetchTeamMembers();
   }, []);
 
-  // === Projects handlers ===
-  const handleProjectInputChange = (e) => {
-    setNewProject({ ...newProject, [e.target.name]: e.target.value });
-  };
-
-  const handleProjectFileChange = (e) => {
-    setNewProject({ ...newProject, image: e.target.files[0] });
-  };
-
-  const handleAddProject = (e) => {
-    e.preventDefault();
-
-    if (!newProject.image) {
-      setError("Please select an image for project");
-      return;
+  async function fetchTeamMembers() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/team-get");
+      if (!res.ok) throw new Error("Failed to fetch team members");
+      const data = await res.json();
+      setTeamMembers(data);
+    } catch (e) {
+      setError(e.message);
     }
+    setLoading(false);
+  }
 
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("title", newProject.title);
-    formData.append("description", newProject.description);
-    formData.append("image", newProject.image);
-    formData.append("link", newProject.link);
-
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to add project");
-        return res.json();
-      })
-      .then((addedProject) => {
-        setProjects((prev) => [...prev, addedProject]);
-        setNewProject({ title: "", description: "", image: null, link: "" });
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
-
-  const handleDeleteProject = (id) => {
-    setLoading(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/projects/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to delete project");
-        return res.json();
-      })
-      .then(() => {
-        setProjects((prev) => prev.filter((p) => p.id !== id));
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
-
-  // === Team handlers ===
-  const handleTeamInputChange = (e) => {
-    setNewMember({ ...newMember, [e.target.name]: e.target.value });
-  };
-
-  const handleTeamFileChange = (e) => {
-    setNewMember({ ...newMember, image: e.target.files[0] });
-  };
-
-  const handleAddTeamMember = (e) => {
-    e.preventDefault();
-
-    if (!newMember.image) {
-      setError("Please select an image for team member");
-      return;
+  async function handleDelete(id) {
+    if (!window.confirm("Delete this team member?")) return;
+    try {
+      const res = await fetch("/api/team-delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete team member");
+      await fetchTeamMembers();
+    } catch (e) {
+      setError(e.message);
     }
+  }
 
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("name", newMember.name);
-    formData.append("role", newMember.role);
-    formData.append("image", newMember.image);
-
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to add team member");
-        return res.json();
-      })
-      .then((addedMember) => {
-        setTeam((prev) => [...prev, addedMember]);
-        setNewMember({ name: "", role: "", image: null });
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
-
-  const handleDeleteTeamMember = (id) => {
-    setLoading(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/team/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to delete team member");
-        return res.json();
-      })
-      .then(() => {
-        setTeam((prev) => prev.filter((m) => m.id !== id));
-        setError(null);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
+  async function handleAdd(e) {
+    e.preventDefault();
+    setAdding(true);
+    setError("");
+    try {
+      const res = await fetch("/api/team-add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to add team member");
+      }
+      setForm({
+        name: "",
+        role: "",
+        field: "",
+        bio: "",
+        email: "",
+        phone: "",
+        linkedin: "",
+        github: "",
+        avatar: "",
+      });
+      await fetchTeamMembers();
+    } catch (e) {
+      setError(e.message);
+    }
+    setAdding(false);
+  }
 
   return (
-    <>
-      <style>{`
-        body {
-          font-family: 'Segoe UI', sans-serif;
-          margin: 0;
-          padding: 0;
-          background: #f4f7f9;
-        }
-        .admin-page {
-          max-width: 900px;
-          margin: 2rem auto;
-          padding: 2rem;
-          background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .admin-page h2 {
-          font-size: 2rem;
-          margin-bottom: 1.5rem;
-          color: #333;
-        }
-        .back-button {
-          margin-bottom: 1.5rem;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          border: none;
-          cursor: pointer;
-          background-color: #007bff;
-          color: #fff;
-          font-size: 1rem;
-        }
-        .back-button:hover {
-          background-color: #0056b3;
-        }
-        .admin-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-        .admin-form input[type="text"],
-        .admin-form textarea {
-          padding: 0.75rem 1rem;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          font-size: 1rem;
-          width: 100%;
-        }
-        .admin-form input[type="file"] {
-          font-size: 1rem;
-        }
-        .admin-form button {
-          padding: 0.75rem;
-          font-size: 1rem;
-          background-color: #007bff;
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: background 0.3s;
-        }
-        .admin-form button:hover {
-          background-color: #0056b3;
-        }
-        .admin-project-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
-        }
-        .admin-project-item {
-          padding: 1rem;
-          border: 1px solid #ddd;
-          border-radius: 10px;
-          background-color: #fafafa;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-          text-align: center;
-        }
-        .admin-project-item h3 {
-          margin-bottom: 0.5rem;
-        }
-        .admin-project-item img {
-          margin-top: 0.5rem;
-          margin-bottom: 0.5rem;
-          max-width: 100%;
-          max-height: 150px;
-          border-radius: 6px;
-        }
-        .admin-project-item a {
-          display: inline-block;
-          color: #007bff;
-          text-decoration: none;
-          margin-bottom: 0.5rem;
-        }
-        .admin-project-item button {
-          margin-top: 0.5rem;
-          padding: 0.5rem 1rem;
-          background-color: #dc3545;
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-        .admin-project-item button:hover {
-          background-color: #a71d2a;
-        }
-      `}</style>
+    <div style={{ maxWidth: 800, margin: "2rem auto", padding: "1rem" }}>
+      <h1>Admin Panel</h1>
+      <p>
+        Welcome, {user.username} (<b>{user.role}</b>)
+      </p>
+      <button onClick={onLogout} style={{ marginBottom: 20 }}>
+        Logout
+      </button>
 
-      <section className="admin-page">
-        <h2>Admin Dashboard – Projects</h2>
-
-        <button className="back-button" onClick={() => navigate("/")}>
-          &larr; Back
-        </button>
-
-        {error && <p style={{ color: "red" }}>Error: {error}</p>}
-
-        {/* Project Form */}
-        <form onSubmit={handleAddProject} className="admin-form">
-          <input
-            type="text"
-            name="title"
-            placeholder="Project Title"
-            value={newProject.title}
-            onChange={handleProjectInputChange}
-            required
-            disabled={loading}
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={newProject.description}
-            onChange={handleProjectInputChange}
-            required
-            disabled={loading}
-          />
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleProjectFileChange}
-            required
-            disabled={loading}
-          />
-          <input
-            type="text"
-            name="link"
-            placeholder="Project Link"
-            value={newProject.link}
-            onChange={handleProjectInputChange}
-            required
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add Project"}
-          </button>
-        </form>
-
-        {/* Projects List */}
-        <div className="admin-project-list">
-          {projects.map((project) => (
-            <div key={project.id} className="admin-project-item">
-              <h3>{project.title}</h3>
-              <p>{project.description}</p>
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}${project.image}`}
-                alt={project.title}
+      <section>
+        <h2>Team Members</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p style={{ color: "red" }}>{error}</p>
+        ) : (
+          <>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {teamMembers.map((member) => (
+                <li
+                  key={member.id}
+                  style={{
+                    borderBottom: "1px solid #ccc",
+                    padding: "10px 0",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <strong>{member.name}</strong> — {member.role} (
+                    {member.field})
+                  </div>
+                  <button
+                    onClick={() => handleDelete(member.id)}
+                    style={{ color: "red" }}
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <hr style={{ margin: "20px 0" }} />
+            <h3>Add New Team Member</h3>
+            <form onSubmit={handleAdd} style={{ display: "grid", gap: 8 }}>
+              <input
+                type="text"
+                placeholder="Name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
               />
-              <br />
-              <a href={project.link} target="_blank" rel="noopener noreferrer">
-                Project Link
-              </a>
-              <br />
-              <button
-                onClick={() => handleDeleteProject(project.id)}
-                disabled={loading}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Team Section */}
-        <h2>Admin Dashboard – Team Members</h2>
-
-        <form onSubmit={handleAddTeamMember} className="admin-form">
-          <input
-            type="text"
-            name="name"
-            placeholder="Member Name"
-            value={newMember.name}
-            onChange={handleTeamInputChange}
-            required
-            disabled={loading}
-          />
-          <input
-            type="text"
-            name="role"
-            placeholder="Role"
-            value={newMember.role}
-            onChange={handleTeamInputChange}
-            required
-            disabled={loading}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleTeamFileChange}
-            required
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add Team Member"}
-          </button>
-        </form>
-
-        <div className="admin-project-list">
-          {team.map((member) => (
-            <div key={member.id} className="admin-project-item">
-              <h3>{member.name}</h3>
-              <p>{member.role}</p>
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}${member.image}`}
-                alt={member.name}
+              <input
+                type="text"
+                placeholder="Role"
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                required
               />
-              <br />
-              <button
-                onClick={() => handleDeleteTeamMember(member.id)}
-                disabled={loading}
-              >
-                Delete
+              <input
+                type="text"
+                placeholder="Field"
+                value={form.field}
+                onChange={(e) => setForm({ ...form, field: e.target.value })}
+                required
+              />
+              <textarea
+                placeholder="Bio"
+                value={form.bio}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                rows={3}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+              <input
+                type="tel"
+                placeholder="Phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                required
+              />
+              <input
+                type="url"
+                placeholder="LinkedIn URL"
+                value={form.linkedin}
+                onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
+              />
+              <input
+                type="url"
+                placeholder="GitHub URL"
+                value={form.github}
+                onChange={(e) => setForm({ ...form, github: e.target.value })}
+              />
+              <input
+                type="url"
+                placeholder="Avatar URL"
+                value={form.avatar}
+                onChange={(e) => setForm({ ...form, avatar: e.target.value })}
+              />
+              <button type="submit" disabled={adding}>
+                {adding ? "Adding..." : "Add Member"}
               </button>
-            </div>
-          ))}
-        </div>
+            </form>
+          </>
+        )}
       </section>
-    </>
+    </div>
   );
-};
-
-export default Admin;
+}
