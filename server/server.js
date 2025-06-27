@@ -5,36 +5,33 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-// process.env.PORT ||
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Ensure upload folder exists
+// Ensure uploads folder exists
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// Multer setup for projects and team photos
+// Multer setup (store files in uploads/, filename is timestamp + original)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 const upload = multer({ storage });
 
-// In-memory data stores
+// In-memory data storage
 let projects = [];
 let projectIdCounter = 1;
 
 let team = [];
 let teamIdCounter = 1;
 
-// ---- ROUTES ----
-
-// Login
+// ----- AUTH ROUTE -----
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body;
   if (username === "admin" && password === "password123") {
@@ -66,7 +63,7 @@ app.post("/api/projects", upload.single("image"), (req, res) => {
       id: projectIdCounter++,
       title,
       description,
-      image: imagePath,
+      image: imagePath, // consistent naming: 'image'
       link,
     };
 
@@ -87,6 +84,7 @@ app.delete("/api/projects/:id", (req, res) => {
     return res.status(404).json({ error: "Project not found" });
   }
 
+  // Delete project image file from disk
   const imagePath = path.join(__dirname, projects[index].image);
   if (fs.existsSync(imagePath)) {
     fs.unlinkSync(imagePath);
@@ -104,21 +102,21 @@ app.get("/api/team", (req, res) => {
 });
 
 // Add a team member
-app.post("/api/team", upload.single("photo"), (req, res) => {
+app.post("/api/team", upload.single("image"), (req, res) => {
   try {
     const { name, role } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ error: "Photo is required" });
+      return res.status(400).json({ error: "Image is required" });
     }
 
-    const photoPath = `/uploads/${req.file.filename}`;
+    const imagePath = `/uploads/${req.file.filename}`;
 
     const newMember = {
       id: teamIdCounter++,
       name,
       role,
-      photo: photoPath,
+      image: imagePath, // consistent naming: 'image'
     };
 
     team.push(newMember);
@@ -138,7 +136,8 @@ app.delete("/api/team/:id", (req, res) => {
     return res.status(404).json({ error: "Team member not found" });
   }
 
-  const imagePath = path.join(__dirname, team[index].photo);
+  // Delete team member image file from disk
+  const imagePath = path.join(__dirname, team[index].image);
   if (fs.existsSync(imagePath)) {
     fs.unlinkSync(imagePath);
   }
